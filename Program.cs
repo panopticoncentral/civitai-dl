@@ -159,8 +159,11 @@ internal class Program
         {
             var postTitle = SanitizeFileName(!string.IsNullOrEmpty(post.Title) ? post.Title : "Untitled");
             var userName = SanitizeFileName(post.User?.Username ?? "Unknown User");
-            var dirName = SanitizeFileName($"{post.Id}_{postTitle}");
-            var postDir = Path.Combine(outputDir, userName, dirName);
+
+            var postDirName = SanitizeFileName($"{postTitle} [{post.Id}]");
+            var userDirName = SanitizeFileName($"{userName} [{post.User?.Id}]");
+            
+            var postDir = Path.Combine(outputDir, userDirName, postDirName);
 
             Console.WriteLine($"Downloading post {count}: {postTitle} (ID: {post.Id})");
 
@@ -186,7 +189,7 @@ internal class Program
                         Console.WriteLine($"  - Skipping image {i + 1}/{post.Images.Count}");
                         continue;
                     }
-                    var fileName = $"image_{image.Id}.jpg";
+                    var fileName = $"{image.Id}.jpg";
                     var filePath = Path.Combine(postDir, fileName);
                     if (!File.Exists(filePath))
                     {
@@ -304,6 +307,9 @@ public class Post
 
 public class PostUser
 {
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+
     [JsonPropertyName("username")]
     public string? Username { get; set; }
 }
